@@ -1,0 +1,48 @@
+//Check if Decoding is working
+//There are 10 instructions
+11110001001011111111111100010010 //BX on R2 allways
+11111010000000000000000000000000 //B with an offset of 0 allways
+11110010001110101000000000001111 //Data Processing Xor Instruction Source is R10 and 15 Destination is R8
+11110001000011110001000000000000 //MRS Transfer CPSR to R1
+11110001001010011111000000000001 //MSR Transfer R1 to CSPR
+11110000001101010000100110011100 //MLA Destination is R5 and Mult SRC Registers are R9 and R12 and Add Src Register is R0
+11110000101100000001100010011110 //MLAL with Destination being R0 and R1 with R14 and R8 being MULT registers and R0 and R1 being destination registers as well
+11110100110100000001000000000000 //LDR From memory location stored in R0 to register R1
+11110000000110000101000011010000 //LDRSB Load the Signed Byte the Memory at the memory address R8 + R0 to the register R5
+11111000000000000000011111111110 //STM Store all registers except R0 and R15 to the adress in RO...The incriment is going downward
+11110001010000000011000010011010 //SWP Swap MEMORY at R0 + R10 to the Memory Address in R2
+
+
+//Second program unlimited branching with incrimenting number
+11110011101010000000000000000000 //MOV R0, #0
+11110011101010000001000000000001 //MOV R1, #1
+11111111000000000000000000000001 //SWI #1 //print what is in R0 register
+11110000100100000000000000000001 //ADD R0, R0, R1 //Ro is incrimented by 1
+11111010011111111111111111111110 //B 0x04 (CurAddr + (-0x02 << 2)) Branch -8 = adress 4
+
+//3rd program with decrimenting number that stops at zero
+11100011101000000000000011111111 //MOV R0, #255
+11100011101000010001000000000001 //MOV R1, #1
+11100011101000110011000000010000 //MOV R3, #16
+11101111000000000000000000000001 //SWI #1 //print what is in R0 register
+11100000010100000000000000000001 //SUB R0, R0, R1 //Ro is decrimented by 1
+11000001001011111111111100010011 //BX to adress stored in R3 which should be 16
+00000110000000000000000000010000 //STOP
+
+//The next Program does the same thing but instead of using Register 3 it utilizes Register 2
+11100011101000000000000011111111 //MOV R0, #255
+11100011101000010001000000000001 //MOV R1, #1
+11100011101000100010000000001100 //MOV R2, #12
+11101111000000000000000000000001 //SWI #1 //Print the value in the R0 Register
+11100001010100000000000000000001 //SUB R0, R0, R1
+11000001001011111111111100010010 //BX to adress stored in R2 which is 12
+00000110000000000000000000010000 //STOP
+
+
+
+
+
+
+
+
+
