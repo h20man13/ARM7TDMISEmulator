@@ -1,8 +1,20 @@
 package io.github.H20man13.ARM7TDMISEmulator;
 
-import io.github.h20man13.emulator_ide.gui.GuiEde;
-import io.github.h20man13.emulator_ide.gui.gui_machine.GuiRam;
-import io.github.h20man13.emulator_ide.gui.gui_machine.GuiRegister;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.List;
+import java.util.concurrent.Callable;
+
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+
+import io.github.H20man13.emulator_ide.gui.GuiEde;
+import io.github.H20man13.emulator_ide.gui.gui_machine.GuiRam;
+import io.github.H20man13.emulator_ide.gui.gui_machine.GuiRegister;
+import io.github.H20man13.ArmAssembler.AssemblerVisitor;
+import io.github.H20man13.ArmAssembler.grammar.ParserLexer;
+import io.github.H20man13.ArmAssembler.grammar.ParserParser;
+import io.github.H20man13.ArmAssembler.grammar.ParserParser.ProgramContext;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -36,9 +48,46 @@ public class Loader extends Application {
 		int NumberOfBytesInRow = 4;
 
 		GuiEde EdeInstance = new GuiEde(NumberOfBytes, NumberOfBytesInRow, GuiRam.AddressFormat.DECIMAL, GuiRam.MemoryFormat.HEXADECIMAL, stage.getMaxWidth(), stage.getMaxHeight());
+		EdeInstance.AddJavaJob("Assemble", new Callable<Void>() {
+			public Void call(){
+				try{
+					FileReader Reader = new FileReader("InputAssembly.a");
+					ANTLRInputStream byteStream = new ANTLRInputStream(Reader);
+					ParserLexer lex = new ParserLexer(byteStream);
+					CommonTokenStream tokStream = new CommonTokenStream(lex);
+					ParserParser parse = new ParserParser(tokStream);
+					ProgramContext ctx = parse.program();
+					AssemblerVisitor visitor = new AssemblerVisitor();
+					List<Integer> assembledCode = visitor.assembleCode(ctx);
 
-		EdeInstance.AddExeJob("Assemble", "ArmAssembler.exe -i TempInput -o TempOutput -e TempError", "TempInput", "TempOutput", "TempError", "StandardError");
-		EdeInstance.AddVerilogJob("Execute", "emulator_ide/src/main/java/edu/depauw/emulator_ide/processor/ARM7TDMIS.v", "default", "StandardInput", "StandardOutput", "StandardError");
+					//Now we just need to write to the Output File
+					FileWriter writer = new FileWriter("OutputBinary.bin");
+					for(Integer assembledCodeInstr : assembledCode){
+						StringBuilder resultBuilder = new StringBuilder();
+						String rawBinaryString = Integer.toBinaryString(assembledCodeInstr);
+						if(rawBinaryString.length() > 32){
+							rawBinaryString = rawBinaryString.substring(rawBinaryString.length() - 32);
+						}
+						
+						if(rawBinaryString.length() < 32){
+							for(int i = 0; i < 32 - rawBinaryString.length(); i++){
+								resultBuilder.append('0');
+							}
+							resultBuilder.append(rawBinaryString);
+							rawBinaryString = resultBuilder.toString();
+						}
+
+						writer.append(rawBinaryString);
+						writer.append('\n');
+					}
+				} catch(Exception exp){
+					EdeInstance.appendIoText("StandardError", exp.toString());
+				}
+				return null;
+			}
+		}, "InputAssembly.a", "OutputBinary.bin", "StandardError");
+
+		EdeInstance.AddVerilogJob("Execute", "processor/ARM7TDMIS.v", "default", "StandardInput", "StandardOutput", "StandardError");
 
 		int RegisterLength = 32;
 		EdeInstance.AddRegister("CPSR", RegisterLength, GuiRegister.Format.BINARY);
