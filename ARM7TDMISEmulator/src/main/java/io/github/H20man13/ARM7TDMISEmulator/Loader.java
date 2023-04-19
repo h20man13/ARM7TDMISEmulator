@@ -80,6 +80,7 @@ public class Loader extends Application {
 						writer.append(rawBinaryString);
 						writer.append('\n');
 					}
+					writer.close();
 				} catch(Exception exp){
 					EdeInstance.appendIoText("StandardError", exp.toString());
 				}
