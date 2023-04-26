@@ -48,6 +48,12 @@ public class Loader extends Application {
 		int NumberOfBytesInRow = 4;
 
 		GuiEde EdeInstance = new GuiEde(NumberOfBytes, NumberOfBytesInRow, GuiRam.AddressFormat.DECIMAL, GuiRam.MemoryFormat.HEXADECIMAL, stage.getMaxWidth(), stage.getMaxHeight());
+		
+		String[] assemblerKeywords = new String[]{
+			"B", "BL", "BX", "LDM", "LDR", "MLA", "MRS", "MSR", "MUL", "STM",
+			"STR", "SWI", "SWP", "ADD", "AND", "EOR", "SUB", "RSB", "ADC",
+			"SBC", "RSC", "ORR", "BIC", "TST", "TEQ", "CMP", "CMN", "MOV", "MVN", "STOP"
+		};
 		EdeInstance.AddJavaJob("Assemble", new Callable<Void>() {
 			public Void call(){
 				try{
@@ -86,7 +92,7 @@ public class Loader extends Application {
 				}
 				return null;
 			}
-		}, "InputAssembly.a", "OutputBinary.bin", "StandardError");
+		}, "InputAssembly.a", "OutputBinary.bin", "StandardError", assemblerKeywords);
 
 		EdeInstance.AddVerilogJob("Execute", "processor/ARM7TDMIS.v", "default", "StandardInput", "StandardOutput", "StandardError");
 
