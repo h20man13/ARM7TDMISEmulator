@@ -4,27 +4,19 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.testfx.framework.junit.ApplicationTest;
 
 import edu.depauw.declan.common.Source;
 import edu.depauw.declan.common.ast.Program;
-import io.github.H20man13.emulator_ide.common.debug.ErrorLog;
-import io.github.H20man13.emulator_ide.gui.GuiEde;
-import io.github.H20man13.emulator_ide.gui.gui_job.GuiJob.TextAreaType;
-import io.github.H20man13.emulator_ide.gui.gui_machine.GuiRam;
-import io.github.H20man13.emulator_ide.gui.gui_machine.GuiRegister;
-import io.github.H20man13.ArmAssembler.AddressCalculatorVisitor;
 import io.github.H20man13.ArmAssembler.AssemblerVisitor;
 import io.github.H20man13.ArmAssembler.grammar.ParserLexer;
 import io.github.H20man13.ArmAssembler.grammar.ParserParser;
-import io.github.H20man13.ArmAssembler.grammar.ParserParser.ProgramContext;
 import io.github.H20man13.DeClan.common.IrRegisterGenerator;
 import io.github.H20man13.DeClan.common.ReaderSource;
-import io.github.H20man13.DeClan.common.analysis.LiveVariableAnalysis;
 import io.github.H20man13.DeClan.common.icode.ICode;
 import io.github.H20man13.DeClan.main.MyCodeGenerator;
 import io.github.H20man13.DeClan.main.MyDeClanLexer;
@@ -34,20 +26,25 @@ import io.github.H20man13.DeClan.main.MyIrLexer;
 import io.github.H20man13.DeClan.main.MyIrParser;
 import io.github.H20man13.DeClan.main.MyOptimizer;
 import io.github.H20man13.DeClan.main.MyStandardLibrary;
-import javafx.application.Application;
+import io.github.H20man13.emulator_ide.gui.GuiEde;
+import io.github.H20man13.emulator_ide.gui.gui_job.GuiJob.TextAreaType;
+import io.github.H20man13.emulator_ide.gui.gui_machine.GuiRam;
+import io.github.H20man13.emulator_ide.gui.gui_machine.GuiRegister;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-public class Loader extends Application {
-	private IrRegisterGenerator gen;
-
-	public Loader(){
-		gen = new IrRegisterGenerator();
-	}
-
-	/**
+/**
+ * Unit test for simple App.
+ */
+public class IntegrationTestUtils extends ApplicationTest{
+    private IrRegisterGenerator gen;
+    
+    public IntegrationTestUtils(){
+        gen = new IrRegisterGenerator();
+    }
+    /**
 	 * The following code builds the default ArmTDMI7 machine in java
 	 * This is the default machine if no xml Config File is provided 
 	 * @param stage
@@ -147,7 +144,7 @@ public class Loader extends Application {
 					ParserLexer lex = new ParserLexer(byteStream);
 					CommonTokenStream tokStream = new CommonTokenStream(lex);
 					ParserParser parse = new ParserParser(tokStream);
-					ProgramContext ctx = parse.program();
+					io.github.H20man13.ArmAssembler.grammar.ParserParser.ProgramContext ctx = parse.program();
 					AssemblerVisitor visitor = new AssemblerVisitor();
 					List<Integer> assembledCode = visitor.assembleCode(ctx);
 
@@ -213,12 +210,10 @@ public class Loader extends Application {
 		stage.setScene(scene);
 		stage.setMaximized(true);
 		stage.show();
-	}
+    }
     
-
     @Override
-    public void start(Stage stage){
-		buildDefaultMachine(stage);
-	}
-    
+    public void start(Stage arg0) throws Exception {
+        buildDefaultMachine(arg0);
+    }
 }

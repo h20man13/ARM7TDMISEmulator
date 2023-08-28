@@ -1,0 +1,21 @@
+B begin_0
+h: .WORD 0
+i: .WORD 10
+begin_0: B begin_1
+WriteLn: LDR R2, [R14]
+SUB R14, R14, #2
+WriteInt: LDR R3, [R14]
+SUB R14, R14, #2
+WriteReal: LDR R2, [R14]
+SUB R14, R14, #2
+ReadInt: LDR R3, [R14]
+SUB R14, R14, #2
+begin_1: LDR R2, i
+STR R2, j
+B begin_2
+begin_2: ADD R14, R14, #3
+LDR R3, j
+LDR R3, c
+STR R3, [R14,-R3]
+BL WriteInt
+STP

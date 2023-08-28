@@ -1,5 +1,8 @@
 MOV R0, #255
-MOV R1, #255
-MOV R0, #255
+MOV R1, #2
+MOV R2, #1
+begin: SUB R0, R0, R2
 SWI 1
-STOP
+CMP R0, R1
+BGT begin
+STP
